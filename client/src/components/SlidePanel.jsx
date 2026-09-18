@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Jessica Birky
 
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { Plus, Copy, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Trash2 } from 'lucide-react'
+import { Plus, Copy, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Trash2, Download } from 'lucide-react'
 import { shapeSvgString } from '../utils/shapeUtils'
 import { pointsToPath } from '../utils/drawingUtils'
 
@@ -137,7 +137,7 @@ function buildColumns(slides) {
   return sortedKeys.map(k => ({ colNum: k, items: colMap[k] }))
 }
 
-export default function SlidePanel({ slides, currentIndex, onSelect, onAdd, onAddColumn, onDelete, onDuplicate, onMove, onMoveInColumn, onMoveToColumn, slideW = 960, slideH = 540, referencesSlideIndex = -1, referencesCount = 0 }) {
+export default function SlidePanel({ slides, currentIndex, onSelect, onAdd, onAddColumn, onDelete, onDuplicate, onMove, onMoveInColumn, onMoveToColumn, onImport, slideW = 960, slideH = 540, referencesSlideIndex = -1, referencesCount = 0 }) {
   const [dragOverInfo, setDragOverInfo] = useState(null) // { flatIndex, colNum }
   const dragSrcRef = useRef(null)
   const listRef = useRef(null)
@@ -279,6 +279,10 @@ export default function SlidePanel({ slides, currentIndex, onSelect, onAdd, onAd
           <button className="add-slide-btn" onClick={onAddColumn} title="Start a 2D vertical column" style={{ fontSize: 11 }}>
             <Plus size={12} />
             Add Column
+          </button>
+          <button className="add-slide-btn" onClick={onImport} title="Import slides from another presentation" style={{ fontSize: 11 }}>
+            <Download size={12} />
+            Import Slide
           </button>
         </div>
       </div>
@@ -428,10 +432,14 @@ export default function SlidePanel({ slides, currentIndex, onSelect, onAdd, onAd
         </div>
       </div>
 
-      <div className="slide-panel-footer">
+      <div className="slide-panel-footer" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <button className="add-slide-btn" style={{ fontSize: 11 }} onClick={() => onAdd(currentColNum)}>
           <Plus size={12} />
           Add to Col {currentColIdx + 1}
+        </button>
+        <button className="add-slide-btn" onClick={onImport} title="Import slides from another presentation" style={{ fontSize: 11 }}>
+          <Download size={12} />
+          Import Slide
         </button>
       </div>
     </div>

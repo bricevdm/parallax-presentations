@@ -37,6 +37,7 @@ import AnimeModal from '../components/AnimeModal'
 import ThreeModal from '../components/ThreeModal'
 import BibliographyModal from '../components/BibliographyModal'
 import DiagramModal from '../components/DiagramModal'
+import ImportSlideModal from '../components/ImportSlideModal'
 import DatasetPanel from '../components/DatasetPanel'
 import DynSysEditor from '../components/DynSysEditor'
 import EquationPalette from '../components/EquationPalette'
@@ -306,6 +307,7 @@ export default function EditorPage({ presentationId, isTemplate = false, onGoHom
   const [drawTool, setDrawTool] = useState(null) // null = off, { color, strokeWidth, opacity, smooth } = drawing mode
   const [manimEditorState, setManimEditorState] = useState(null) // { elementId, content, sceneName, quality, rendered, rendering, error }
   const [pendingAddColumn, setPendingAddColumn] = useState(null) // colNum to add slide to when template modal confirms
+  const [showImportSlideModal, setShowImportSlideModal] = useState(false)
   const [activeMathNode, setActiveMathNode] = useState(null) // { latex, display, fontSize, color } when inline math node is clicked
   const mathNodeUpdateRef = useRef(null) // holds the TipTap updateAttributes fn for the active math node
 
@@ -1757,6 +1759,23 @@ function draw() {
       elements: [{ id: crypto.randomUUID(), type: 'image', src: url, x: 0, y: 0, width: sw, height: sh, objectFit: 'contain', zIndex: 1 }],
       notes: '',
       background: { type: 'color', color: '#000000' },
+    }))
+    setPresentation(prev => {
+      const slides = [...prev.slides]
+      slides.splice(currentSlideIndex + 1, 0, ...newSlides)
+      return { ...prev, slides }
+    })
+    setCurrentSlideIndex(currentSlideIndex + 1)
+  }
+
+  const importSlidesFromPresentation = (importedSlides) => {
+    if (!importedSlides.length) return
+    const is2D = presentation.slides.some(s => s.column !== undefined)
+    const newSlides = importedSlides.map(slide => ({
+      ...slide,
+      id: crypto.randomUUID(),
+      ...(is2D ? { column: presentation.slides[currentSlideIndex]?.column ?? 0 } : {}),
+      elements: (slide.elements || []).map(el => ({ ...el, id: crypto.randomUUID() })),
     }))
     setPresentation(prev => {
       const slides = [...prev.slides]
@@ -3385,6 +3404,7 @@ function draw() {
           onSelect={setCurrentSlideIndex}
           onAdd={(colNum) => { setPendingAddColumn(colNum ?? null); setShowTemplateModal(true) }}
           onAddColumn={addColumn}
+          onImport={() => setShowImportSlideModal(true)}
           onDelete={deleteSlide}
           onDuplicate={duplicateSlide}
           onMove={moveSlide}
@@ -4195,6 +4215,13 @@ function draw() {
             </div>
           </div>
         </div>
+      )}
+      {showImportSlideModal && (
+        <ImportSlideModal
+          currentPresentationId={presentationId}
+          onImport={importSlidesFromPresentation}
+          onClose={() => setShowImportSlideModal(false)}
+        />
       )}
       {/* Park the TipTap editor DOM off-screen when not editing so ProseMirror's
           contenteditable node doesn't float at (0,0) inside the slide canvas. */}

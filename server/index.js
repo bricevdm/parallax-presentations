@@ -1009,7 +1009,7 @@ ${slidesHtml}
     var _globalTransition = '${transition}';
     var _isGlobalCustom = _customTransitions.indexOf(_globalTransition) !== -1;
     Reveal.initialize({
-      hash: true,
+      hash: location.protocol !== 'blob:',   // replaceState throws in blob: windows and aborts reveal's startup (transitions stay disabled)
       width: ${slideW},
       height: ${slideH},
       margin: 0,

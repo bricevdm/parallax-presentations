@@ -940,6 +940,7 @@ ${(() => {
       }
 
       function togglePanel() {
+        if (!togglePanel._built) { togglePanel._built = true; buildThumbnails(); updateActive(); }
         isOpen = !isOpen;
         if (isOpen) panel.classList.add('open');
         else panel.classList.remove('open');
@@ -951,7 +952,7 @@ ${(() => {
         if (e.key === 'g' || e.key === 'G') { e.preventDefault(); togglePanel(); }
       });
 
-      Reveal.on('ready', function() { buildThumbnails(); updateActive(); });
+      Reveal.on('ready', function() { updateActive(); });   // thumbnails are built on first open (lazy media)
       Reveal.on('slidechanged', function() { updateActive(); });
     })();
 `

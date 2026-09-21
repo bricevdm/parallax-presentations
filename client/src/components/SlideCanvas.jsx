@@ -543,18 +543,23 @@ export default function SlideCanvas({ editor, slide, selectedElementIds, editing
         }
       } else if (drag.type === 'resize') {
         let updates = applyResize(drag.handle, drag.startEl, dx, dy)
-        if (e.shiftKey) {
-          const ratio = drag.startEl.width / drag.startEl.height
-          if (['nw','ne','sw','se'].includes(drag.handle)) {
-            if (Math.abs(updates.width - drag.startEl.width) >= Math.abs(updates.height - drag.startEl.height)) {
-              updates.height = Math.max(MIN_SIZE, Math.round(updates.width / ratio))
-              if (drag.handle === 'ne' || drag.handle === 'nw') updates.y = drag.startEl.y + drag.startEl.height - updates.height
-            } else {
-              updates.width = Math.max(MIN_SIZE, Math.round(updates.height * ratio))
-              if (drag.handle === 'nw' || drag.handle === 'sw') updates.x = drag.startEl.x + drag.startEl.width - updates.width
-            }
+        // Images/videos keep their aspect ratio by default (Shift = free resize); other elements lock with Shift.
+        const isMedia = drag.startEl.type === 'image' || drag.startEl.type === 'video'
+        const lockAspect = isMedia ? !e.shiftKey : e.shiftKey
+        const ratio = drag.startEl.width / drag.startEl.height
+        const enforceAspect = () => {
+          const h = drag.handle
+          const widthDriven = ['e','w'].includes(h) || (['nw','ne','sw','se'].includes(h) &&
+            Math.abs(updates.width - drag.startEl.width) >= Math.abs(updates.height - drag.startEl.height))
+          if (widthDriven) {
+            updates.height = Math.max(MIN_SIZE, Math.round(updates.width / ratio))
+            if (h === 'ne' || h === 'nw') updates.y = drag.startEl.y + drag.startEl.height - updates.height
+          } else {
+            updates.width = Math.max(MIN_SIZE, Math.round(updates.height * ratio))
+            if (h === 'nw' || h === 'sw') updates.x = drag.startEl.x + drag.startEl.width - updates.width
           }
         }
+        if (lockAspect) enforceAspect()
         updates.x = snap(Math.max(0, updates.x))
         updates.y = snap(Math.max(0, updates.y))
         updates.width = snap(Math.min(SLIDE_W - updates.x, updates.width))
@@ -573,6 +578,7 @@ export default function SlideCanvas({ editor, slide, selectedElementIds, editing
         }
         updates.width = Math.max(MIN_SIZE, updates.width)
         updates.height = Math.max(MIN_SIZE, updates.height)
+        if (lockAspect) enforceAspect()          // snapping may have nudged one side; restore the ratio
         onUpdateElement(drag.elementId, updates)
       } else if (drag.type === 'rotate') {
         // Calculate angle from element center to mouse position

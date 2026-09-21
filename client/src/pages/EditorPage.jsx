@@ -609,6 +609,18 @@ export default function EditorPage({ presentationId, isTemplate = false, onGoHom
     })
   }, [])
 
+  // Resizing a cropped image/video scales the crop window with the box, so the visible framing is kept.
+  // Callers that set crop fields themselves (crop commit / reset) are left alone.
+  const applyElementUpdate = (el, updates) => {
+    if (el.imageW != null && ('width' in updates || 'height' in updates) && !('imageW' in updates)) {
+      const kx = el.width ? (updates.width ?? el.width) / el.width : 1
+      const ky = el.height ? (updates.height ?? el.height) / el.height : 1
+      updates = { ...updates,
+        imageW: el.imageW * kx, imageH: el.imageH * ky,
+        imageOffsetX: (el.imageOffsetX ?? 0) * kx, imageOffsetY: (el.imageOffsetY ?? 0) * ky }
+    }
+    return { ...el, ...updates }
+  }
   const updateElement = useCallback((id, updates) => {
     setPresentation(prev => {
       if (!prev) return prev
@@ -618,7 +630,7 @@ export default function EditorPage({ presentationId, isTemplate = false, onGoHom
           i === currentSlideIndexRef.current ? {
             ...s,
             elements: s.elements.map(el =>
-              el.id === id ? { ...el, ...updates } : el
+              el.id === id ? applyElementUpdate(el, updates) : el
             )
           } : s
         )

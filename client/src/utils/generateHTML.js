@@ -323,7 +323,11 @@ export function generateRevealHTML(presentation) {
             vidScript = `<script>${parts.join(';')}</script>`
           }
           if (hasClip && el.loop) attrs.splice(attrs.indexOf('loop'), attrs.indexOf('loop') >= 0 ? 1 : 0)
-          return `<div${dataId}${fragClass}${fragIdx}${gsapAttrs} style="${style}"><video src="${src}" ${attrs.join(' ')}${posterAttr} style="width:100%;height:100%;object-fit:contain;display:block;background:#000;"></video>${vidScript}</div>`
+          const vFit = el.objectFit || 'contain'
+          const vStyle = el.imageW != null
+            ? `position:absolute;left:${el.imageOffsetX ?? 0}px;top:${el.imageOffsetY ?? 0}px;width:${el.imageW}px;height:${el.imageH}px;max-width:none;max-height:none;object-fit:${vFit};display:block;`
+            : `width:100%;height:100%;object-fit:${vFit};display:block;`
+          return `<div${dataId}${fragClass}${fragIdx}${gsapAttrs} style="${style}"><video src="${src}" ${attrs.join(' ')}${posterAttr} style="${vStyle}"></video>${vidScript}</div>`
         }
         if (el.type === 'manim' && !el.rendered) return '' // not yet rendered — omit from export
         if (el.type === 'audio') {

@@ -1453,6 +1453,7 @@ function CanvasElement({ element, isSelected, isEditing, isCropping, cropState, 
         </pre>
       )}
       {element.type === 'video' && (
+        <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
         <video
           ref={el => {
             if (!el) return
@@ -1472,10 +1473,13 @@ function CanvasElement({ element, isSelected, isEditing, isCropping, cropState, 
           muted={element.muted || false}
           loop={false}
           poster={element.poster || undefined}
-          style={{ width: '100%', height: '100%', objectFit: element.objectFit || 'contain', display: 'block', pointerEvents: isSelected ? 'auto' : 'none' }}
+          style={element.imageW != null
+            ? { position: 'absolute', left: element.imageOffsetX ?? 0, top: element.imageOffsetY ?? 0, width: element.imageW, height: element.imageH, maxWidth: 'none', maxHeight: 'none', objectFit: element.objectFit || 'contain', display: 'block', pointerEvents: isSelected ? 'auto' : 'none' }
+            : { width: '100%', height: '100%', objectFit: element.objectFit || 'contain', display: 'block', pointerEvents: isSelected ? 'auto' : 'none' }}
         >
           <source src={element.src} type={/\.webm$/i.test(element.src) ? 'video/webm' : /\.og[gv]$/i.test(element.src) ? 'video/ogg' : 'video/mp4'} />
         </video>
+        </div>
       )}
       {element.type === 'audio' && (
         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.2)', borderRadius: 4 }}>

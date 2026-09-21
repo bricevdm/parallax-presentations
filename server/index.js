@@ -696,7 +696,11 @@ function generateRevealHTML(presentation, opts = {}) {
             vidScript = `<script>${parts.join(';')}</script>`
           }
           if (hasClip && el.loop) { const li = attrs.indexOf('loop'); if (li >= 0) attrs.splice(li, 1) }
-          return `<div${fragClass}${fragIdx} style="${style}"><video ${attrs.join(' ')}${posterAttr} style="width:100%;height:100%;object-fit:${el.objectFit||'contain'};display:block;"><source src="${safeVideoSrc}" type="${videoMime}"></video>${vidScript}</div>`
+          const vFit = sanitizeCSSValue(el.objectFit) || 'contain'
+          const vStyle = el.imageW != null
+            ? `position:absolute;left:${Number(el.imageOffsetX) || 0}px;top:${Number(el.imageOffsetY) || 0}px;width:${Number(el.imageW)}px;height:${Number(el.imageH)}px;max-width:none;max-height:none;object-fit:${vFit};display:block;`
+            : `width:100%;height:100%;object-fit:${vFit};display:block;`
+          return `<div${fragClass}${fragIdx} style="${style}"><video ${attrs.join(' ')}${posterAttr} style="${vStyle}"><source src="${safeVideoSrc}" type="${videoMime}"></video>${vidScript}</div>`
         }
         if (el.type === 'audio') {
           const attrs = ['controls']

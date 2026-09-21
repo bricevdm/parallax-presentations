@@ -1006,10 +1006,15 @@ export default function SlideCanvas({ editor, slide, selectedElementIds, editing
               if (editingElementId === element.id) return
               if (element.locked && type === 'move') return
               e.stopPropagation()
-              onToggleSelectElement(element.id, e.shiftKey || e.ctrlKey || e.metaKey)
+              const multi = e.shiftKey || e.ctrlKey || e.metaKey
+              // Selection is decided on pointer-down only (the click handler used to toggle it a second
+              // time, cancelling Shift-click). Pressing an already-selected element keeps the current
+              // multi-selection so it can be dragged as a whole.
+              if (multi) onToggleSelectElement(element.id, true)
+              else if (!selectedElementIds.includes(element.id)) onToggleSelectElement(element.id, false)
               startElementDrag(e, element.id, type, handle)
             }}
-            onClick={(e) => { e.stopPropagation(); if (!cropMode && !drawToolRef.current) onToggleSelectElement(element.id, e.shiftKey || e.ctrlKey || e.metaKey) }}
+            onClick={(e) => { e.stopPropagation() }}
             onDoubleClick={(e) => {
               e.stopPropagation()
               if (element.type === 'text') onStartEdit(element.id)

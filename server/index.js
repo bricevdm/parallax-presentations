@@ -675,7 +675,7 @@ function generateRevealHTML(presentation, opts = {}) {
         if (el.type === 'video') {
           const attrs = []
           if (el.controls !== false) attrs.push('controls')
-          if (el.autoplay) attrs.push('autoplay')
+          if (el.autoplay) { attrs.push('autoplay'); attrs.push('data-autoplay') }
           if (el.loop) attrs.push('loop')
           if (el.muted) attrs.push('muted')
           const safeVideoSrc = sanitizeUrl(el.src)
@@ -700,7 +700,7 @@ function generateRevealHTML(presentation, opts = {}) {
         }
         if (el.type === 'audio') {
           const attrs = ['controls']
-          if (el.autoplay) attrs.push('autoplay')
+          if (el.autoplay) { attrs.push('autoplay'); attrs.push('data-autoplay') }
           if (el.loop) attrs.push('loop')
           if (el.muted) attrs.push('muted')
           return `<div${fragClass}${fragIdx} style="${style}display:flex;align-items:center;justify-content:center;"><audio src="${sanitizeUrl(el.src)}" ${attrs.join(' ')} style="width:90%;"></audio></div>`

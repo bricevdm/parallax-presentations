@@ -304,7 +304,7 @@ export function generateRevealHTML(presentation) {
           const src = absoluteSrc(el.type === 'manim' ? el.rendered : el.src)
           const attrs = []
           if (el.type === 'manim') { if (el.controls) attrs.push('controls'); if (el.autoplay !== false) attrs.push('autoplay'); if (el.loop !== false) attrs.push('loop'); if (el.muted !== false) attrs.push('muted') }
-          else { if (el.controls !== false) attrs.push('controls'); if (el.autoplay) attrs.push('autoplay'); if (el.loop) attrs.push('loop'); if (el.muted) attrs.push('muted') }
+          else { if (el.controls !== false) attrs.push('controls'); if (el.autoplay) { attrs.push('autoplay'); attrs.push('data-autoplay') }; if (el.loop) attrs.push('loop'); if (el.muted) attrs.push('muted') }
           const posterAttr = el.poster ? ` poster="${absoluteSrc(el.poster)}"` : ''
           const hasClip = (el.startTime != null && el.startTime > 0) || el.endTime != null
           const rate = el.playbackRate && el.playbackRate !== 1 ? el.playbackRate : null
@@ -329,7 +329,7 @@ export function generateRevealHTML(presentation) {
         if (el.type === 'audio') {
           const src = absoluteSrc(el.src)
           const attrs = ['controls']
-          if (el.autoplay) attrs.push('autoplay')
+          if (el.autoplay) { attrs.push('autoplay'); attrs.push('data-autoplay') }
           if (el.loop) attrs.push('loop')
           if (el.muted) attrs.push('muted')
           return `<div${dataId}${fragClass}${fragIdx}${gsapAttrs} style="${style}display:flex;align-items:center;justify-content:center;"><audio src="${src}" ${attrs.join(' ')} style="width:90%;"></audio></div>`

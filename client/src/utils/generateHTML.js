@@ -163,9 +163,9 @@ export function generateRevealHTML(presentation) {
             const offX = el.imageOffsetX ?? 0
             const offY = el.imageOffsetY ?? 0
             const imgStyle = `position:absolute;left:${offX}px;top:${offY}px;width:${el.imageW}px;height:${el.imageH}px;object-fit:${el.objectFit||'contain'};${filterStyle}`
-            return `<div${dataId}${fragClass}${fragIdx}${gsapAttrs}${expandAttr}${popupAttr} style="${cStyle}${interactiveCursor}">${clipOpen}<img src="${src}" alt="${el.alt||''}" style="${imgStyle}" />${clipClose}${capHtml}${sup}</div>`
+            return `<div${dataId}${fragClass}${fragIdx}${gsapAttrs}${expandAttr}${popupAttr} style="${cStyle}${interactiveCursor}">${clipOpen}<img data-src="${src}" alt="${el.alt||''}" style="${imgStyle}" />${clipClose}${capHtml}${sup}</div>`
           }
-          return `<div${dataId}${fragClass}${fragIdx}${gsapAttrs}${expandAttr}${popupAttr} style="${cStyle}${interactiveCursor}">${clipOpen}<img src="${src}" alt="${el.alt||''}" style="display:block;width:100%;height:100%;object-fit:${el.objectFit||'contain'};${filterStyle}" />${clipClose}${capHtml}${sup}</div>`
+          return `<div${dataId}${fragClass}${fragIdx}${gsapAttrs}${expandAttr}${popupAttr} style="${cStyle}${interactiveCursor}">${clipOpen}<img data-src="${src}" alt="${el.alt||''}" style="display:block;width:100%;height:100%;object-fit:${el.objectFit||'contain'};${filterStyle}" />${clipClose}${capHtml}${sup}</div>`
         }
         if (el.type === 'shape') {
           const opacityStyle = el.opacity !== undefined && el.opacity !== 1 ? `opacity:${el.opacity};` : ''
@@ -327,7 +327,7 @@ export function generateRevealHTML(presentation) {
           const vStyle = el.imageW != null
             ? `position:absolute;left:${el.imageOffsetX ?? 0}px;top:${el.imageOffsetY ?? 0}px;width:${el.imageW}px;height:${el.imageH}px;max-width:none;max-height:none;object-fit:${vFit};display:block;`
             : `width:100%;height:100%;object-fit:${vFit};display:block;`
-          return `<div${dataId}${fragClass}${fragIdx}${gsapAttrs} style="${style}"><video src="${src}" ${attrs.join(' ')}${posterAttr} style="${vStyle}"></video>${vidScript}</div>`
+          return `<div${dataId}${fragClass}${fragIdx}${gsapAttrs} style="${style}"><video data-src="${src}" preload="none" ${attrs.join(' ')}${posterAttr} style="${vStyle}"></video>${vidScript}</div>`
         }
         if (el.type === 'manim' && !el.rendered) return '' // not yet rendered — omit from export
         if (el.type === 'audio') {
@@ -644,6 +644,8 @@ ${slidesHtml}
     var _globalTransition = '${presentation.transition || 'slide'}';
     var _isGlobalCustom = _customTransitions.indexOf(_globalTransition) !== -1;
     Reveal.initialize({
+      viewDistance: 2,
+      mobileViewDistance: 1,
       hash: location.protocol !== 'blob:',   // replaceState throws in blob: windows and aborts reveal's startup (transitions stay disabled)
       width: ${slideW},
       height: ${slideH},
@@ -917,6 +919,7 @@ ${(() => {
           clone.querySelectorAll('.reveal-footer').forEach(function(f) { f.remove(); });
           clone.querySelectorAll('iframe').forEach(function(f) { f.remove(); });
           clone.querySelectorAll('video').forEach(function(v) { v.pause(); v.removeAttribute('autoplay'); });
+          clone.querySelectorAll('img[data-src]').forEach(function(im) { im.src = im.getAttribute('data-src'); });
           wrap.appendChild(clone);
         } else {
           wrap.style.background = 'rgba(30,30,46,0.8)';

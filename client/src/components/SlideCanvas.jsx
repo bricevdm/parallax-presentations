@@ -653,7 +653,7 @@ export default function SlideCanvas({ editor, slide, selectedElementIds, editing
       startClientX: e.clientX, startClientY: e.clientY,
       startMouseX: (e.clientX - rect.left) / scale,
       startMouseY: (e.clientY - rect.top) / scale,
-      startEl: { x: element.x, y: element.y, width: element.width, height: element.height, snapRef: element.snapRef },
+      startEl: { x: element.x, y: element.y, width: element.width, height: element.height, snapRef: element.snapRef, type: element.type },
       startEls: allSelected.map(el => ({ id: el.id, x: el.x, y: el.y, width: el.width, height: el.height }))
     }
   }

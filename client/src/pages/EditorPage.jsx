@@ -598,14 +598,16 @@ export default function EditorPage({ presentationId, isTemplate = false, onGoHom
       if (updates.__replaceAllSlides) {
         return { ...prev, slides: updates.__replaceAllSlides }
       }
+      // Use the ref, not the state: the canvas registers its drag handlers once and would otherwise keep
+      // a stale copy of this updater bound to the first slide (axis-line drags landed on slide 1).
       return {
         ...prev,
         slides: prev.slides.map((s, i) =>
-          i === currentSlideIndex ? { ...s, ...updates } : s
+          i === currentSlideIndexRef.current ? { ...s, ...updates } : s
         )
       }
     })
-  }, [currentSlideIndex])
+  }, [])
 
   const updateElement = useCallback((id, updates) => {
     setPresentation(prev => {
